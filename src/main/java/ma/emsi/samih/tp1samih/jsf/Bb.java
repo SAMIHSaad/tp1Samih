@@ -7,6 +7,10 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
+import ma.emsi.samih.tp1samih.llm.JsonUtilPourGemini;
+import ma.emsi.samih.tp1samih.llm.LlmInteraction;
+import ma.emsi.samih.tp1samih.llm.RequeteException;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +67,9 @@ public class Bb implements Serializable {
      */
     @Inject
     private FacesContext facesContext;
+
+    @Inject
+    private JsonUtilPourGemini jsonUtil;
 
     /**
      * Obligatoire pour un bean CDI (classe gérée par CDI), s'il y a un autre constructeur.
@@ -152,19 +159,28 @@ public class Bb implements Serializable {
             return null;
         }
         
-        // Mon traitement : compter le nombre de mots.
-        this.reponse = "Votre question comporte " + question.split("\s+").length + " mots.";
-        
-        // Si la conversation n'a pas encore commencé, ajouter le rôle système au début de la réponse
+        // À la première requête, transmettre le rôle système au client JSON
+        if (this.conversation.isEmpty() && roleSysteme != null && !roleSysteme.isBlank()) {
+            jsonUtil.setSystemRole(roleSysteme);
+        }
+
+        try {
+            LlmInteraction interaction = jsonUtil.envoyerRequete(question);
+            this.reponse = interaction.reponseExtraite();
+            this.texteRequeteJson = interaction.questionJson();
+            this.texteReponseJson = interaction.reponseJson();
+        } catch (RequeteException e) {
+            FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Problème de connexion avec l'API du LLM",
+                    "Problème de connexion avec l'API du LLM" + e.getMessage());
+            facesContext.addMessage(null, message);
+            return null;
+        }
+
         if (this.conversation.isEmpty()) {
-            // Ajouter le rôle système au début de la réponse
-            if(roleSysteme != null && !roleSysteme.isEmpty()){
-                this.reponse = roleSysteme.toUpperCase(Locale.FRENCH) + "\n" + this.reponse;
-            }
-            // Invalide le bouton pour changer le rôle système
             this.roleSystemeChangeable = false;
         }
-        // La conversation contient l'historique des questions-réponses depuis le début.
+
         afficherConversation();
         return null;
     }
