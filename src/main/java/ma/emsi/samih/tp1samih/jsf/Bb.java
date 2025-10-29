@@ -225,6 +225,9 @@ public class Bb implements Serializable {
                     + " you tell them what are the main places to visit in the country or the town"
                     + " are you tell them the average price of a meal.";
             this.listeRolesSysteme.add(new SelectItem(role, "Guide touristique"));
+
+            role = "Vous êtes un historien. Si l'utilisateur mentionne un pays dans sa question, vous lui fournissez des informations sur l'histoire de ce pays. Vous pouvez aborder les dynasties, les dirigeants, les événements majeurs, et l'évolution culturelle et sociale.";
+            this.listeRolesSysteme.add(new SelectItem(role, "Historien"));
         }
 
         return this.listeRolesSysteme;

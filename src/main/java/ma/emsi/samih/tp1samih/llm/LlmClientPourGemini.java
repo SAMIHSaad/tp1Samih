@@ -65,3 +65,5 @@ public class LlmClientPourGemini implements Serializable {
         }
     }
 }
+//Problème de connexion avec l'API du LLM400 : Bad Request
+//Problème de connexion avec l'API du LLM400 : Bad Request
