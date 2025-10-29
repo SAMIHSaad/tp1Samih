@@ -136,7 +136,7 @@ public class JsonUtilPourGemini implements Serializable {
                         .add("text", question))
                 .build();
         JsonObject userContent = Json.createObjectBuilder()
-                .add("role", "user")
+                .add("role", "system")
                 .add("parts", userContentParts)
                 .build();
         JsonArray contents = Json.createArrayBuilder()
@@ -215,3 +215,5 @@ public class JsonUtilPourGemini implements Serializable {
     }
 
 }
+
+//Problème de connexion avec l'API du LLM400 : Bad Request
